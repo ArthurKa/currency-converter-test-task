@@ -3,6 +3,7 @@ import { useCallback, useMemo, useState } from 'react';
 import styled from 'styled-components';
 import { CurrencyCode } from '../types';
 import { countExchange } from '../utils';
+import { ArrowButton } from './ArrowButton';
 import { CurrencyItem } from './CurrencyItem';
 
 export interface CurrencyConverterProps {
@@ -115,6 +116,18 @@ export const CurrencyConverter: React.FC<CurrencyConverterProps> = ({ items, def
     });
   }, [firstAmount, firstCurrency, preprocessSet]);
 
+  const arrowButtonClick = useCallback(() => {
+    preprocessSet({
+      mainAmount: secondAmount,
+      mainCurrency: secondCurrency,
+      dependentCurrency: firstCurrency,
+      setMainAmount: setFirstAmount,
+      setMainCurrency: setFirstCurrency,
+      setDependentAmount: setSecondAmount,
+      setDependentCurrency: setSecondCurrency,
+    });
+  }, [firstCurrency, preprocessSet, secondAmount, secondCurrency]);
+
   return (
     <CurrencyConverterWrapper>
       <CurrencyItem {...{
@@ -125,7 +138,7 @@ export const CurrencyConverter: React.FC<CurrencyConverterProps> = ({ items, def
         currencyOptions,
       }}
       />
-      🡆
+      <ArrowButton {...{ onClick: arrowButtonClick }} />
       <CurrencyItem {...{
         amount: secondAmount,
         setAmount: preprocessedSetSecondAmount,
