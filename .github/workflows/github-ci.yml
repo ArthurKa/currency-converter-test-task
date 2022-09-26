@@ -1,0 +1,35 @@
+name: Deploy
+
+on:
+  push:
+    branches: production
+
+env:
+  SERVER_IP: 157.90.248.157
+  SERVER_USERNAME: root
+  SERVER_COMMANDS:
+    PATH="$PATH:/root/.nvm/versions/node/v14.16.0/bin";
+    OLD_PACKAGE_NAME=./package${RANDOM}.json;
+    cd ~/test-tasks/currency-converter;
+    git checkout .;
+    git checkout production;
+    cp package.json $OLD_PACKAGE_NAME;
+    git fetch;
+    git reset --hard origin/production;
+    node $compare_packages/dependencies_are_different_or_node_modules_not_exists.js . $OLD_PACKAGE_NAME && echo "Reinstalling modules..." && npm ci;
+    rm -rf $OLD_PACKAGE_NAME;
+    npm run build && (
+      pm2 flush currency-converter -s;
+      pm2 restart currency-converter -s;
+      pm2 reset currency-converter -s;
+      echo "New build has been deployed.";
+    );
+
+jobs:
+  restart-server:
+    runs-on: ubuntu-18.04
+    steps:
+      - name: Connect to server via SSH
+        run:
+          sshpass &>/dev/null || sudo apt install sshpass -y &>/dev/null;
+          sshpass -p '${{secrets.SERVER_PASSWORD}}' ssh -o StrictHostKeyChecking=no ${{env.SERVER_USERNAME}}@${{env.SERVER_IP}} '${{env.SERVER_COMMANDS}}';
