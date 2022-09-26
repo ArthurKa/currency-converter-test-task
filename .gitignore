@@ -1,0 +1,5 @@
+node_modules
+.next
+.env
+.hintrc
+tsconfig.tsbuildinfo
