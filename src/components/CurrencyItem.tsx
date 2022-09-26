@@ -61,7 +61,7 @@ export const CurrencyItem: React.FC<CurrencyItemProps> = ({
     lastSelection.current = [selectionStart, selectionEnd];
   }, []);
   const preprocessAmountChange = useCallback((e: { currentTarget: { value: string } }) => {
-    const value = e.currentTarget.value.replace(',', '.');
+    const value = e.currentTarget.value.replace(',', '.').replace(/(\.\d{2}).*$/, '$1');
     const newAmount = +value;
 
     if(!Number.isFinite(newAmount)) {
